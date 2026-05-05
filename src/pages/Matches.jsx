@@ -24,6 +24,7 @@ export default function Matches() {
     }
   };
 
+  // --- 2. SAYFA İLK AÇILDIĞINDA ÇALIŞACAK BLOK (Linter Dostu) ---
   useEffect(() => {
     const loadInitialData = async () => {
       try {
@@ -36,7 +37,14 @@ export default function Matches() {
     loadInitialData();
   }, []);
 
-  // --- 3. RADAR: YENİ AJAN BUL ---
+  const visibleRequests = pendingRequests.filter(req => {
+    const hideTime = new Date(req.expiresAt);
+    hideTime.setHours(hideTime.getHours() + 5);
+    
+    return new Date() <= hideTime; 
+  });
+
+  // --- 4. RADAR: YENİ KULLANICI BUL ---
   const findNewMatch = async () => {
     setLoading(true);
     setMatchData(null); 
@@ -44,7 +52,7 @@ export default function Matches() {
     try {
       const response = await api.post('/Match/find');
       setMatchData(response.data);
-      toast.success('Sistemin seçtiği ajan ekranda! 🚀');
+      toast.success('Sistemin seçtiği kullanıcı ekranda! 🚀');
     } catch (error) {
       console.error(error); 
       if (error.response && error.response.status === 404) {
@@ -57,7 +65,7 @@ export default function Matches() {
     }
   };
 
-  // --- 4. RADAR: İSTEK GÖNDER ---
+  // --- 5. RADAR: İSTEK GÖNDER ---
   const handleSendRequest = async () => {
     if (!matchData) return;
     setActionLoading(true);
@@ -75,19 +83,24 @@ export default function Matches() {
     }
   };
 
-  // --- 5. GELEN İSTEĞİ KABUL ET ---
+  // --- 6. GELEN İSTEĞİ KABUL ET ---
   const handleAcceptPending = async (matchId) => {
     try {
       await api.post(`/Match/${matchId}/accept`);
+      
       toast.success('Eşleşme sağlandı! Artık mesajlaşabilirsiniz. 🎉');
       fetchPendingRequests();
     } catch (error) {
-      console.error(error); 
-      toast.error('Kabul işlemi başarısız oldu.');
+      console.error("Backend Hata Detayı:", error.response?.data); 
+      
+      const errorData = error.response?.data;
+      const backendMessage = errorData?.detail || errorData?.title || 'Bilinmeyen bir hata oluştu.';
+      
+      toast.error(`Sistem Diyor ki: ${backendMessage}`);
     }
   };
 
-  // --- 6. ÇIKIŞ YAP ---
+  // --- 7. ÇIKIŞ YAP ---
   const handleLogout = () => {
     localStorage.removeItem('token');
     toast('Başarıyla çıkış yapıldı.', { icon: '👋' });
@@ -115,7 +128,7 @@ export default function Matches() {
           disabled={loading || actionLoading}
           style={{ padding: '12px 24px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '16px', fontWeight: 'bold', width: '100%' }}
         >
-          {loading ? 'Radar Taranıyor...' : 'Yeni Ajan Bul 🔍'}
+          {loading ? 'Radar Taranıyor...' : 'Yeni Kullanıcı Bul 🔍'}
         </button>
       </div>
 
@@ -145,26 +158,52 @@ export default function Matches() {
       <div>
         <h3 style={{ color: '#fff', marginBottom: '15px' }}>Bekleyen İstekler ⏳</h3>
         
-        {pendingRequests.length === 0 ? (
+        {visibleRequests.length === 0 ? (
           <p style={{ color: '#666', fontSize: '14px' }}>Henüz bir hareket yok.</p>
         ) : (
-          pendingRequests.map(req => (
-            <div key={req.matchId} style={{ border: '1px solid #444', backgroundColor: '#111', borderRadius: '8px', padding: '15px', marginBottom: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div>
-                <h4 style={{ margin: '0 0 5px 0', color: '#fff' }}>@{req.nickname}</h4>
-                <p style={{ margin: 0, fontSize: '12px', color: '#aaa' }}>Seni bekliyor...</p>
+          visibleRequests.map(req => {
+            const isExpired = new Date(req.expiresAt) <= new Date();
+
+            return (
+              <div key={req.matchId} style={{ 
+                border: '1px solid #444', 
+                backgroundColor: '#111', 
+                borderRadius: '8px', 
+                padding: '15px', 
+                marginBottom: '10px', 
+                display: 'flex', 
+                justifyContent: 'space-between', 
+                alignItems: 'center',
+                opacity: isExpired ? 0.5 : 1
+              }}>
+                <div>
+                  <h4 style={{ margin: '0 0 5px 0', color: '#fff', textDecoration: isExpired ? 'line-through' : 'none' }}>
+                    @{req.nickname}
+                  </h4>
+                  <p style={{ margin: 0, fontSize: '12px', color: isExpired ? '#dc3545' : '#aaa' }}>
+                    {isExpired ? 'Fırsat kaçtı...' : 'Seni bekliyor...'}
+                  </p>
+                </div>
+                <button 
+                  onClick={() => !isExpired && handleAcceptPending(req.matchId)}
+                  disabled={isExpired}
+                  style={{ 
+                    backgroundColor: isExpired ? '#333' : '#007bff', 
+                    color: isExpired ? '#777' : '#fff', 
+                    padding: '8px 16px', 
+                    border: 'none', 
+                    borderRadius: '6px', 
+                    cursor: isExpired ? 'not-allowed' : 'pointer', 
+                    fontWeight: 'bold' 
+                  }}
+                >
+                  {isExpired ? 'SÜRESİ DOLDU' : 'KABUL ET'}
+                </button>
               </div>
-              <button 
-                onClick={() => handleAcceptPending(req.matchId)}
-                style={{ backgroundColor: '#ffc107', color: '#000', padding: '8px 16px', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}
-              >
-                KABUL ET
-              </button>
-            </div>
-          ))
+            );
+          })
         )}
       </div>
-
     </div>
   );
 }
