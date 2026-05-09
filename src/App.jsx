@@ -4,7 +4,11 @@ import './App.css';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Matches from './pages/Matches';
+import Chat from './pages/Chat';
 import ProtectedRoute from './components/ProtectedRoute';
+import Layout from './components/Layout';
+import Chats from './pages/Chats';
+import Profile from './pages/profile';
 
 function App() {
   return (
@@ -12,14 +16,30 @@ function App() {
       <Route path="/" element={<Navigate to="/login" replace />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
-      
-      <Route 
-        path="/matches" 
+
+      {/* ALT MENÜSÜ OLAN SAYFALAR */}
+      <Route
         element={
           <ProtectedRoute>
-            <Matches />
+            <Layout />
           </ProtectedRoute>
-        } 
+        }
+      >
+        <Route path="/matches" element={<Matches />} />
+        
+        <Route path="/chats" element={<Chats />} />
+        
+        <Route path="/profile" element={<Profile />} />
+      </Route>
+
+      {/* ALT MENÜSÜ OLMAYAN SAYFALAR */}
+      <Route
+        path="/chat/:matchId"
+        element={
+          <ProtectedRoute>
+            <Chat />
+          </ProtectedRoute>
+        }
       />
     </Routes>
   );
