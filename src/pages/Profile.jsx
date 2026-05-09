@@ -30,7 +30,8 @@ export default function Profile() {
   };
 
   const handleEditProfile = () => {
-    toast('Düzenleme moduna geçiliyor...', { icon: '⚙️' });
+    toast('Profil düzenleme ekranı yakında eklenecek!', { icon: '🚧' });
+    // İleride buraya navigate('/profile/edit') eklenebilir.
   };
 
   const nickname = profile?.nickname || profile?.Nickname || 'Kullanıcı';
@@ -39,7 +40,8 @@ export default function Profile() {
   const initial = nickname !== 'Kullanıcı' ? nickname.charAt(0).toUpperCase() : '?';
 
   return (
-    <div style={{ maxWidth: '500px', margin: '0 auto', padding: '20px' }}>
+    // DİKKAT: overflowY ve paddingBottom eklendi. Butonlar asla alt menünün arkasında kalmayacak.
+    <div style={{ maxWidth: '500px', margin: '0 auto', padding: '20px', paddingBottom: '100px', height: '100vh', overflowY: 'auto', boxSizing: 'border-box' }}>
       
       <h2 style={{ color: '#fff', marginBottom: '30px', borderBottom: '1px solid #333', paddingBottom: '10px', textAlign: 'left' }}>
         Profilim 👤
@@ -82,7 +84,6 @@ export default function Profile() {
       {/* BUTONLAR BÖLGESİ */}
       <div style={{ marginTop: '30px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
         
-        {/* PROFİLİ DÜZENLE BUTONU */}
         <button 
           onClick={handleEditProfile}
           style={{ width: '100%', padding: '15px', backgroundColor: '#1e293b', color: '#fff', border: '1px solid #334155', borderRadius: '12px', cursor: 'pointer', fontSize: '16px', fontWeight: 'bold' }}
