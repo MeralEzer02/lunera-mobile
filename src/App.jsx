@@ -8,7 +8,8 @@ import Chat from './pages/Chat';
 import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
 import Chats from './pages/Chats';
-import Profile from './pages/profile';
+import Profile from './pages/Profile';
+import EditProfile from './pages/EditProfile';
 
 function App() {
   return (
@@ -30,6 +31,8 @@ function App() {
         <Route path="/chats" element={<Chats />} />
         
         <Route path="/profile" element={<Profile />} />
+
+        <Route path="/profile/edit" element={<EditProfile />} /> 
       </Route>
 
       {/* ALT MENÜSÜ OLMAYAN SAYFALAR */}
