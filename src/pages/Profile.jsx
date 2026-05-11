@@ -29,9 +29,8 @@ export default function Profile() {
     navigate('/login', { replace: true });
   };
 
-  const handleEditProfile = () => {
-    toast('Profil düzenleme ekranı yakında eklenecek!', { icon: '🚧' });
-    // İleride buraya navigate('/profile/edit') eklenebilir.
+const handleEditProfile = () => {
+    navigate('/profile/edit');
   };
 
   const nickname = profile?.nickname || profile?.Nickname || 'Kullanıcı';
@@ -40,7 +39,6 @@ export default function Profile() {
   const initial = nickname !== 'Kullanıcı' ? nickname.charAt(0).toUpperCase() : '?';
 
   return (
-    // DİKKAT: overflowY ve paddingBottom eklendi. Butonlar asla alt menünün arkasında kalmayacak.
     <div style={{ maxWidth: '500px', margin: '0 auto', padding: '20px', paddingBottom: '100px', height: '100vh', overflowY: 'auto', boxSizing: 'border-box' }}>
       
       <h2 style={{ color: '#fff', marginBottom: '30px', borderBottom: '1px solid #333', paddingBottom: '10px', textAlign: 'left' }}>
