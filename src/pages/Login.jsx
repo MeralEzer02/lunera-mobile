@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { api } from '../api/client';
+import { getErrorMessage } from '../utils/getErrorMessage'; 
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -24,7 +25,7 @@ export default function Login() {
       navigate('/matches'); 
     } catch (error) {
       console.error(error);
-      toast.error('Giriş başarısız. Bilgileri kontrol et.');
+      toast.error(getErrorMessage(error)); 
     } finally {
       setLoading(false);
     }

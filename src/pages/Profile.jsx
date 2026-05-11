@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { api } from '../api/client';
+import { getErrorMessage } from '../utils/getErrorMessage';
 
 export default function Profile() {
   const [profile, setProfile] = useState(null);
@@ -13,9 +14,9 @@ export default function Profile() {
       try {
         const response = await api.get('/Auth/my-profile');
         setProfile(response.data);
-      } catch (error) {
-        console.error("Profil çekilemedi:", error);
-        toast.error("Profil bilgileri yüklenemedi.");
+        } catch (error) {
+        console.error("Hata detayı:", error);
+        toast.error(getErrorMessage(error)); 
       } finally {
         setLoading(false);
       }

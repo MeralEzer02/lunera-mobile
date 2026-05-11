@@ -2,14 +2,15 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { api } from '../api/client';
+import { getErrorMessage } from '../utils/getErrorMessage';
 
 export default function Register() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false); // Göz simgesi için state eklendi
+  const [showPassword, setShowPassword] = useState(false);
   const [fullName, setFullName] = useState('');
   const [userName, setUserName] = useState('');
-  const [gender, setGender] = useState('Female'); // Varsayılan değer backend'e uygun hale getirildi
+  const [gender, setGender] = useState('Female');
   const [birthDate, setBirthDate] = useState('');
   const [bio, setBio] = useState('');
   const [loading, setLoading] = useState(false);
@@ -26,7 +27,7 @@ export default function Register() {
         password: password,
         RealName: fullName, 
         Nickname: userName,
-        gender: gender, // Artık arkaplanda 'Female', 'Male' veya 'NonBinary' gidecek
+        gender: gender,
         birthDate: new Date(birthDate).toISOString(),
         bio: bio
       });
@@ -35,7 +36,7 @@ export default function Register() {
       navigate('/login');
     } catch (error) {
       console.error(error);
-      toast.error('Kayıt başarısız! Bilgilerini kontrol et.');
+      toast.error(getErrorMessage(error));
     } finally {
       setLoading(false);
     }
@@ -47,7 +48,6 @@ export default function Register() {
         <h2>Kimlik Yarat</h2>
         <input type="email" placeholder="E-posta" value={email} onChange={(e) => setEmail(e.target.value)} required />
         
-        {/* Şifre ve Göz Simgesi Konteyneri */}
         <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
           <input 
             type={showPassword ? "text" : "password"} 
@@ -60,16 +60,7 @@ export default function Register() {
           <button 
             type="button" 
             onClick={() => setShowPassword(!showPassword)}
-            style={{
-              position: 'absolute',
-              right: '10px',
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              fontSize: '18px',
-              padding: '0',
-              color: '#aaa'
-            }}
+            style={{ position: 'absolute', right: '10px', background: 'none', border: 'none', cursor: 'pointer', fontSize: '18px', padding: '0', color: '#aaa' }}
           >
             {showPassword ? '🙈' : '👁️'}
           </button>

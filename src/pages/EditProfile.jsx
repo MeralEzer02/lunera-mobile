@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { api } from '../api/client';
+import { getErrorMessage } from '../utils/getErrorMessage';
 
 export default function EditProfile() {
   const navigate = useNavigate();
@@ -23,11 +24,11 @@ export default function EditProfile() {
           realName: response.data.realName || '',
           bio: response.data.bio || ''
         });
-      } catch (error) {
-        console.error("Hata detayı:", error);
-        toast.error("Profil bilgileri alınamadı.");
-        navigate('/profile');
-      } finally {
+    } catch (error) {
+      console.error("Hata detayı:", error);
+      toast.error(getErrorMessage(error));
+      navigate('/profile');
+    } finally {
         setLoading(false);
       }
     };
@@ -51,7 +52,7 @@ export default function EditProfile() {
       toast.success("Profilin başarıyla güncellendi!");
       navigate('/profile');
     } catch (error) {
-      toast.error(error.response?.data || "Güncelleme başarısız oldu.");
+      toast.error(getErrorMessage(error));
     } finally {
       setSaving(false);
     }
