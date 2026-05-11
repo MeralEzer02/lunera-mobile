@@ -1,0 +1,11 @@
+:root {
+  --transition-fast: 150ms ease-out;
+  --transition-normal: 250ms ease-out;
+}
+
+.interactive-element {
+  transition: all var(--transition-fast);
+}
+.interactive-element:active {
+  transform: scale(0.98);
+}
