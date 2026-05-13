@@ -1,49 +1,50 @@
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useTheme } from '../theme/ThemeProvider'; 
+import { Sparkles, MessageCircle, User } from 'lucide-react';
+
+import lightBg from '../assets/bg-light.png';
+import darkBg from '../assets/bg-dark.png';
 
 export default function Layout() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { theme, toggleTheme } = useTheme(); // Tema bilgisini alıyoruz
+  const { theme } = useTheme();
 
-  // Alt menü sekmelerimiz
   const navItems = [
-    { path: '/matches', icon: '✨', label: 'Keşif' },
-    { path: '/chats', icon: '💬', label: 'Mesajlar' },
-    { path: '/profile', icon: '👤', label: 'Profil' },
+    { path: '/matches', icon: Sparkles, label: 'Keşif' },
+    { path: '/chats', icon: MessageCircle, label: 'Mesajlar' },
+    { path: '/profile', icon: User, label: 'Profil' },
   ];
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', backgroundColor: 'var(--bg-primary)' }}>
+    <div style={{ 
+      display: 'flex', 
+      flexDirection: 'column', 
+      height: '100vh', 
+      backgroundImage: `url(${theme === 'light' ? lightBg : darkBg})`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundAttachment: 'fixed',
+      position: 'relative'
+    }}>
       
-      {/* ÜST KISIM: Hangi sayfadaysak o sayfanın içeriği buraya gelecek */}
-      <div style={{ flex: 1, overflowY: 'auto', paddingBottom: '80px', position: 'relative' }}>
+      {/* SİHİRLİ BLUR KATMANI */}
+      <div style={{
+        position: 'absolute',
+        top: 0, left: 0, right: 0, bottom: 0,
+        backgroundColor: theme === 'light' ? 'rgba(255, 255, 255, 0.4)' : 'rgba(10, 10, 10, 0.5)',
+        backdropFilter: 'blur(16px)', 
+        WebkitBackdropFilter: 'blur(16px)',
+        zIndex: 0,
+        pointerEvents: 'none'
+      }}></div>
+
+      {/* ÜST KISIM */}
+      <div style={{ flex: 1, overflowY: 'auto', paddingBottom: '80px', position: 'relative', zIndex: 1 }}>
         <Outlet />
-        
-        {/* TEMA DEĞİŞTİRME BUTONU (Geçici olarak burada, test edebilmen için) */}
-        <button 
-          onClick={toggleTheme}
-          style={{
-            position: 'absolute',
-            top: 'var(--space-3)',
-            right: 'var(--space-3)',
-            padding: 'var(--space-2) var(--space-3)',
-            borderRadius: 'var(--radius-full)',
-            backgroundColor: 'var(--surface-primary)',
-            border: '1px solid var(--border-subtle)',
-            color: 'var(--text-primary)',
-            cursor: 'pointer',
-            fontSize: 'var(--font-size-sm)',
-            fontWeight: 'var(--font-weight-medium)',
-            boxShadow: 'var(--shadow-soft)'
-          }}
-          className="interactive-element"
-        >
-          {theme === 'dark' ? '☀️ Light' : '🌙 Dark'}
-        </button>
       </div>
 
-      {/* ALT MENÜ (Premium Bottom Navigation) */}
+      {/* ALT MENÜ */}
       <div style={{
         position: 'fixed',
         bottom: 0,
@@ -51,7 +52,7 @@ export default function Layout() {
         transform: 'translateX(-50%)',
         width: '100%',
         maxWidth: '520px',
-        backgroundColor: 'var(--bg-surface)',
+        backgroundColor: 'var(--surface-primary)', 
         display: 'flex',
         justifyContent: 'space-around',
         alignItems: 'center',
@@ -63,6 +64,8 @@ export default function Layout() {
       }}>
         {navItems.map(item => {
           const isActive = location.pathname.startsWith(item.path);
+          const IconComponent = item.icon; 
+
           return (
             <button
               key={item.path}
@@ -81,12 +84,7 @@ export default function Layout() {
                 transition: 'color var(--transition-fast)'
               }}
             >
-              <span style={{ 
-                fontSize: '20px', 
-                filter: isActive ? 'none' : 'grayscale(100%) opacity(0.7)' 
-              }}>
-                {item.icon}
-              </span>
+              <IconComponent size={24} strokeWidth={isActive ? 2.5 : 2} />
               <span style={{ 
                 fontSize: '11px', 
                 fontWeight: isActive ? 'var(--font-weight-bold)' : 'var(--font-weight-medium)' 

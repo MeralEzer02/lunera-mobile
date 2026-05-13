@@ -1,17 +1,17 @@
 :root,
 [data-theme="dark"] {
-  --bg-primary: #0d1117;
-  --bg-secondary: #111827;
-  --surface-primary: rgba(255, 255, 255, 0.04);
-  --surface-hover: rgba(255, 255, 255, 0.08);
-  --border-subtle: rgba(255, 255, 255, 0.08);
+  --bg-primary: #050505;
+  --bg-secondary: #121212;
+  --surface-primary: rgba(20, 20, 20, 0.2); /* Füme (smoked) cam efekti */
+  --surface-hover: rgba(35, 35, 35, 0.8);
+  --border-subtle: rgba(198, 168, 124, 0.1); /* Çok hafif şampanya yansıması */
 
   --text-primary: #f3f4f6;
   --text-secondary: #d1d5db;
-  --text-muted: #9ca3af;
+  --text-muted: #8c939d;
 
-  --accent-primary: #7c3aed;
-  --accent-secondary: #06b6d4;
+  --accent-primary: #c6a87c; /* Şampanya Altını (Sessiz Gold) */
+  --accent-secondary: #9e825a; /* Koyu Bronz */
 
-  --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.15);
+  --shadow-soft: 0 4px 30px rgba(0, 0, 0, 0.4);
 }

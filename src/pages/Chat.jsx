@@ -2,15 +2,20 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { api } from '../api/client';
+import { ChevronLeft, SendHorizonal } from 'lucide-react';
+import { useTheme } from '../theme/ThemeProvider'; 
+
+import lightBg from '../assets/bg-light.png';
+import darkBg from '../assets/bg-dark.png';
 
 export default function Chat() {
   const { matchId } = useParams();
   const navigate = useNavigate();
+  const { theme } = useTheme(); 
   
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
-  
   const [matchedUser, setMatchedUser] = useState(null); 
   const messagesEndRef = useRef(null);
 
@@ -67,7 +72,6 @@ export default function Chat() {
     };
 
     loadInitialMessages(); 
-    
     const interval = setInterval(fetchMessagesSilently, 5000); 
     return () => clearInterval(interval); 
   }, [fetchMessagesSilently]); 
@@ -99,7 +103,7 @@ export default function Chat() {
       });
       fetchMessagesSilently();
     } catch (error) {
-      console.error(error);
+      console.error(error); 
       toast.error('Mesaj iletilemedi.');
       setMessages(prev => prev.filter(m => m.id !== tempMessage.id)); 
     }
@@ -108,94 +112,108 @@ export default function Chat() {
   let lastDateString = null;
 
   return (
-    <div style={{ 
+    <div className="page-transition" style={{ 
       position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, 
-      backgroundColor: '#0f172a', display: 'flex', justifyContent: 'center', zIndex: 1000 
+      backgroundImage: `url(${theme === 'light' ? lightBg : darkBg})`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      display: 'flex', justifyContent: 'center', zIndex: 2000 
     }}>
+      
+      {/* SİHİRLİ BLUR KATMANI */}
+      <div style={{
+        position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+        backgroundColor: theme === 'light' ? 'rgba(255, 255, 255, 0.4)' : 'rgba(10, 10, 10, 0.5)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
+        zIndex: 0
+      }}></div>
+
       <div style={{ 
-        width: '100%', maxWidth: '500px', height: '100%', 
+        width: '100%', maxWidth: '520px', height: '100%', 
         display: 'flex', flexDirection: 'column', 
-        backgroundColor: '#111', padding: '20px', boxSizing: 'border-box' 
+        padding: 'var(--space-3)', boxSizing: 'border-box',
+        position: 'relative', zIndex: 1
       }}>
         
-        {/* KUSURSUZ ÜST BAR */}
+        {/* ÜST BAR */}
         <div style={{ 
           display: 'flex', alignItems: 'center', 
-          marginBottom: '20px', paddingBottom: '15px', borderBottom: '1px solid #334155' 
+          marginBottom: 'var(--space-3)', padding: 'var(--space-3)', 
+          backgroundColor: 'var(--surface-primary)', borderRadius: 'var(--radius-md)',
+          border: '1px solid var(--border-subtle)', boxShadow: 'var(--shadow-soft)',
+          backdropFilter: 'blur(10px)'
         }}>
           <button 
             onClick={() => navigate('/chats')}
-            style={{ 
-              background: 'transparent', border: 'none', color: '#fff', 
-              fontSize: '24px', cursor: 'pointer', marginRight: '15px', padding: 0 
-            }}
+            style={{ background: 'transparent', border: 'none', color: 'var(--text-primary)', cursor: 'pointer', marginRight: 'var(--space-3)', padding: 0, display: 'flex', alignItems: 'center' }}
           >
-            ←
+            <ChevronLeft size={28} />
           </button>
           <div style={{ 
-            width: '45px', height: '45px', borderRadius: '50%', 
-            backgroundColor: '#7c3aed', display: 'flex', justifyContent: 'center', 
-            alignItems: 'center', color: '#fff', fontWeight: 'bold', 
-            fontSize: '18px', marginRight: '12px' 
+            width: '40px', height: '40px', borderRadius: '50%', backgroundColor: 'var(--accent-primary)', 
+            display: 'flex', justifyContent: 'center', alignItems: 'center', color: 'var(--bg-primary)', 
+            fontWeight: 'bold', fontSize: '16px', marginRight: 'var(--space-2)' 
           }}>
             {matchedUser ? matchedUser.nickname.charAt(0).toUpperCase() : '?'}
           </div>
-          <h3 style={{ margin: 0, color: '#fff', fontSize: '18px' }}>
-            {matchedUser ? `@${matchedUser.nickname}` : 'Yükleniyor...'}
+          <h3 style={{ margin: 0, color: 'var(--text-primary)', fontSize: 'var(--font-size-md)', fontWeight: 'var(--font-weight-medium)' }}>
+            {matchedUser ? `@${matchedUser.nickname}` : '...'}
           </h3>
         </div>
 
         {/* MESAJLAŞMA ALANI */}
         <div style={{ 
-          flex: 1, overflowY: 'auto', padding: '10px', backgroundColor: '#1e293b', 
-          borderRadius: '12px', border: '1px solid #334155', marginBottom: '15px' 
+          flex: 1, overflowY: 'auto', padding: 'var(--space-2)', 
+          display: 'flex', flexDirection: 'column', gap: 'var(--space-2)'
         }}>
           {loading ? (
-            <p style={{ textAlign: 'center', color: '#888' }}>Mesajlar şifreleniyor...</p>
+            <p style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: 'var(--font-size-sm)' }}>Şifreleniyor...</p>
           ) : messages.length === 0 ? (
-            <p style={{ textAlign: 'center', color: '#94a3b8', marginTop: '50%' }}>İlk adımı sen at...</p>
+            <p style={{ textAlign: 'center', color: 'var(--text-muted)', marginTop: '50%', fontSize: 'var(--font-size-sm)' }}>Sohbeti başlat.</p>
           ) : (
             messages.map((msg) => {
               const msgDate = formatDateDivider(msg.createdAt);
               const showDateDivider = msgDate !== lastDateString;
               lastDateString = msgDate; 
 
+              const bubbleTextColor = msg.isMe ? (theme === 'dark' ? '#121212' : '#ffffff') : 'var(--text-primary)';
+              const timeColor = msg.isMe ? (theme === 'dark' ? 'rgba(0,0,0,0.6)' : 'rgba(255,255,255,0.8)') : 'var(--text-muted)';
+              const checkColor = msg.isRead 
+                ? (theme === 'dark' ? '#000' : '#fff') 
+                : (theme === 'dark' ? 'rgba(0,0,0,0.4)' : 'rgba(255,255,255,0.6)');
+
               return (
                 <div key={msg.id}>
-                  
-                  {/* ÇİZGİLİ TARİH AYRACI */}
                   {showDateDivider && (
-                    <div style={{ display: 'flex', alignItems: 'center', margin: '20px 0' }}>
-                      <div style={{ flex: 1, height: '1px', backgroundColor: '#334155' }}></div>
-                      <span style={{ margin: '0 15px', color: '#94a3b8', fontSize: '12px', fontWeight: 'bold', letterSpacing: '1px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', margin: 'var(--space-4) 0' }}>
+                      <div style={{ flex: 1, height: '1px', backgroundColor: 'var(--border-subtle)' }}></div>
+                      <span style={{ margin: '0 var(--space-3)', color: 'var(--text-muted)', fontSize: '11px', fontWeight: 'var(--font-weight-medium)' }}>
                         {msgDate}
                       </span>
-                      <div style={{ flex: 1, height: '1px', backgroundColor: '#334155' }}></div>
+                      <div style={{ flex: 1, height: '1px', backgroundColor: 'var(--border-subtle)' }}></div>
                     </div>
                   )}
 
-                  <div style={{ display: 'flex', justifyContent: msg.isMe ? 'flex-end' : 'flex-start', marginBottom: '15px' }}>
+                  <div style={{ display: 'flex', justifyContent: msg.isMe ? 'flex-end' : 'flex-start', marginBottom: 'var(--space-1)' }}>
+                    {/* MESAJ BALONU */}
                     <div style={{
-                      maxWidth: '70%', padding: '8px 12px',
-                      borderRadius: msg.isMe ? '16px 16px 0 16px' : '16px 16px 16px 0',
-                      backgroundColor: msg.isMe ? '#7c3aed' : '#334155', 
-                      color: '#fff', boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
+                      maxWidth: '75%', padding: '10px 14px',
+                      borderRadius: msg.isMe ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
+                      backgroundColor: msg.isMe ? 'var(--accent-primary)' : 'var(--surface-primary)',
+                      border: msg.isMe ? 'none' : '1px solid var(--border-subtle)',
+                      color: bubbleTextColor,
+                      boxShadow: 'var(--shadow-soft)',
                       display: 'flex', flexDirection: 'column'
                     }}>
-                      <p style={{ margin: '0 0 4px 0', fontSize: '15px', lineHeight: '1.4' }}>{msg.content}</p>
+                      <p style={{ margin: '0 0 4px 0', fontSize: '14px', lineHeight: '1.4' }}>{msg.content}</p>
                       
                       <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '4px' }}>
-                        <span style={{ fontSize: '10px', color: msg.isMe ? '#e9d5ff' : '#cbd5e1' }}>
+                        <span style={{ fontSize: '10px', color: timeColor }}>
                           {formatTime(msg.createdAt)}
                         </span>
                         {msg.isMe && (
-                          <span style={{ 
-                            fontSize: '13px', 
-                            color: msg.isRead ? '#38bdf8' : '#e9d5ff',
-                            letterSpacing: msg.isRead ? '-2px' : '0',
-                            position: 'relative',
-                            right: msg.isRead ? '2px' : '0'
-                          }}>
+                          <span style={{ fontSize: '12px', color: checkColor, letterSpacing: msg.isRead ? '-2px' : '0', position: 'relative', right: msg.isRead ? '2px' : '0' }}>
                             {msg.isRead ? '✓✓' : '✓'}
                           </span>
                         )}
@@ -209,21 +227,34 @@ export default function Chat() {
           <div ref={messagesEndRef} />
         </div>
 
-        {/* MESAJ GÖNDERME KUTUSU */}
-        <form onSubmit={handleSendMessage} style={{ display: 'flex', gap: '10px' }}>
+        {/* INPUT ALANI */}
+        <form onSubmit={handleSendMessage} style={{ display: 'flex', gap: 'var(--space-2)', marginTop: 'var(--space-2)' }}>
           <input 
             type="text" 
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
-            placeholder="Mesajını yaz..." 
-            style={{ flex: 1, padding: '15px', borderRadius: '8px', border: '1px solid #444', backgroundColor: '#1a1a1a', color: '#fff', fontSize: '15px' }}
+            placeholder="Mesaj..." 
+            style={{ 
+              flex: 1, padding: '12px var(--space-3)', borderRadius: 'var(--radius-full)', 
+              border: '1px solid var(--border-subtle)', backgroundColor: 'var(--surface-primary)', 
+              color: 'var(--text-primary)', fontSize: 'var(--font-size-md)', outline: 'none',
+              boxShadow: 'var(--shadow-soft)', backdropFilter: 'blur(10px)'
+            }}
           />
           <button 
             type="submit"
             disabled={!newMessage.trim()}
-            style={{ backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '8px', padding: '0 20px', fontWeight: 'bold', cursor: newMessage.trim() ? 'pointer' : 'not-allowed', opacity: newMessage.trim() ? 1 : 0.5 }}
+            className="interactive-element"
+            style={{ 
+              backgroundColor: newMessage.trim() ? 'var(--accent-primary)' : 'var(--surface-hover)', 
+              color: newMessage.trim() ? (theme === 'dark' ? '#121212' : '#ffffff') : 'var(--text-muted)', 
+              border: '1px solid var(--border-subtle)', borderRadius: '50%', 
+              width: '46px', height: '46px', display: 'flex', justifyContent: 'center', alignItems: 'center',
+              cursor: newMessage.trim() ? 'pointer' : 'not-allowed', transition: 'all 0.2s',
+              boxShadow: newMessage.trim() ? 'var(--shadow-soft)' : 'none'
+            }}
           >
-            GÖNDER
+            <SendHorizonal size={20} />
           </button>
         </form>
 

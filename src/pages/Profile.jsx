@@ -3,18 +3,21 @@ import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { api } from '../api/client';
 import { getErrorMessage } from '../utils/getErrorMessage';
+import { User, Settings, LogOut, Sun, Moon } from 'lucide-react';
+import { useTheme } from '../theme/ThemeProvider'; 
 
 export default function Profile() {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
         const response = await api.get('/Auth/my-profile');
         setProfile(response.data);
-        } catch (error) {
+      } catch (error) {
         console.error("Hata detayı:", error);
         toast.error(getErrorMessage(error)); 
       } finally {
@@ -26,12 +29,8 @@ export default function Profile() {
 
   const handleLogout = () => {
     localStorage.removeItem('token');
-    toast('Başarıyla çıkış yapıldı.', { icon: '👋' });
+    toast('Çıkış yapıldı.', { icon: '👋' });
     navigate('/login', { replace: true });
-  };
-
-const handleEditProfile = () => {
-    navigate('/profile/edit');
   };
 
   const nickname = profile?.nickname || profile?.Nickname || 'Kullanıcı';
@@ -40,61 +39,76 @@ const handleEditProfile = () => {
   const initial = nickname !== 'Kullanıcı' ? nickname.charAt(0).toUpperCase() : '?';
 
   return (
-    <div style={{ maxWidth: '500px', margin: '0 auto', padding: '20px', paddingBottom: '100px', height: '100vh', overflowY: 'auto', boxSizing: 'border-box' }}>
+    <div className="page-transition" style={{ maxWidth: '520px', margin: '0 auto', padding: 'var(--space-4)', paddingBottom: '100px' }}>
       
-      <h2 style={{ color: '#fff', marginBottom: '30px', borderBottom: '1px solid #333', paddingBottom: '10px', textAlign: 'left' }}>
-        Profilim 👤
-      </h2>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: 'var(--space-4)', borderBottom: '1px solid var(--border-subtle)', paddingBottom: 'var(--space-2)' }}>
+        <User size={20} color="var(--text-primary)" />
+        <h2 style={{ color: 'var(--text-primary)', margin: 0, fontSize: 'var(--font-size-xl)' }}>
+          Profil
+        </h2>
+      </div>
 
       {loading ? (
-        <p style={{ color: '#888', textAlign: 'center', marginTop: '50px' }}>Kimlik doğrulanıyor...</p>
+        <p style={{ color: 'var(--text-muted)', textAlign: 'center', fontSize: 'var(--font-size-sm)', marginTop: 'var(--space-6)' }}>Kimlik doğrulanıyor...</p>
       ) : profile ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
           
-          <div style={{ backgroundColor: '#111', border: '1px solid #334155', borderRadius: '16px', padding: '30px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center', boxShadow: '0 10px 25px rgba(0,0,0,0.5)' }}>
-            <div style={{ width: '80px', height: '80px', borderRadius: '50%', backgroundColor: '#7c3aed', display: 'flex', justifyContent: 'center', alignItems: 'center', color: '#fff', fontWeight: 'bold', fontSize: '32px', marginBottom: '15px', boxShadow: '0 4px 15px rgba(124, 58, 237, 0.4)' }}>
+          <div style={{ backgroundColor: 'var(--surface-primary)', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-lg)', padding: 'var(--space-5) var(--space-4)', display: 'flex', flexDirection: 'column', alignItems: 'center', boxShadow: 'var(--shadow-soft)', backdropFilter: 'blur(10px)' }}>
+            <div style={{ width: '80px', height: '80px', borderRadius: '50%', backgroundColor: 'var(--accent-primary)', display: 'flex', justifyContent: 'center', alignItems: 'center', color: 'var(--bg-primary)', fontWeight: 'bold', fontSize: '32px', marginBottom: 'var(--space-3)' }}>
               {initial}
             </div>
-            <h3 style={{ margin: '0 0 5px 0', color: '#fff', fontSize: '22px' }}>@{nickname}</h3>
-            {realName && <p style={{ margin: '0 0 15px 0', color: '#94a3b8', fontSize: '15px' }}>{realName}</p>}
+            <h3 style={{ margin: '0 0 4px 0', color: 'var(--text-primary)', fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-bold)' }}>@{nickname}</h3>
+            {realName && <p style={{ margin: '0 0 var(--space-3) 0', color: 'var(--text-secondary)', fontSize: 'var(--font-size-sm)' }}>{realName}</p>}
+            
             {bio ? (
-              <p style={{ margin: 0, color: '#e2e8f0', fontSize: '14px', textAlign: 'center', fontStyle: 'italic', backgroundColor: '#1e293b', padding: '10px 15px', borderRadius: '8px', width: '100%', boxSizing: 'border-box' }}>"{bio}"</p>
+              <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '14px', textAlign: 'center', fontStyle: 'italic', backgroundColor: 'var(--surface-hover)', padding: '12px 16px', borderRadius: 'var(--radius-sm)', width: '100%', boxSizing: 'border-box' }}>"{bio}"</p>
             ) : (
-              <p style={{ margin: 0, color: '#64748b', fontSize: '13px', textAlign: 'center' }}>Gizemli bir ajan. Kendinden bahsetmemiş.</p>
+              <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '13px', textAlign: 'center' }}>Sistem kaydı kısıtlı. Bilgi yok.</p>
             )}
           </div>
 
-          <div style={{ display: 'flex', gap: '10px' }}>
-            <div style={{ flex: 1, backgroundColor: '#111', border: '1px solid #334155', borderRadius: '12px', padding: '15px', textAlign: 'center' }}>
-              <p style={{ margin: '0 0 5px 0', color: '#94a3b8', fontSize: '12px' }}>Durum</p>
-              <h4 style={{ margin: 0, color: '#10b981', fontSize: '16px' }}>{profile?.status === 1 ? 'Aktif' : 'Aktif'}</h4>
+          <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
+            <div style={{ flex: 1, backgroundColor: 'var(--surface-primary)', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-md)', padding: 'var(--space-3)', textAlign: 'center', backdropFilter: 'blur(10px)' }}>
+              <p style={{ margin: '0 0 4px 0', color: 'var(--text-muted)', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '1px' }}>Durum</p>
+              <h4 style={{ margin: 0, color: 'var(--text-primary)', fontSize: 'var(--font-size-md)', fontWeight: 'var(--font-weight-medium)' }}>Aktif</h4>
             </div>
-            <div style={{ flex: 1, backgroundColor: '#111', border: '1px solid #334155', borderRadius: '12px', padding: '15px', textAlign: 'center' }}>
-              <p style={{ margin: '0 0 5px 0', color: '#94a3b8', fontSize: '12px' }}>Rol</p>
-              <h4 style={{ margin: 0, color: '#7c3aed', fontSize: '16px' }}>Üye</h4>
+            <div style={{ flex: 1, backgroundColor: 'var(--surface-primary)', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-md)', padding: 'var(--space-3)', textAlign: 'center', backdropFilter: 'blur(10px)' }}>
+              <p style={{ margin: '0 0 4px 0', color: 'var(--text-muted)', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '1px' }}>Yetki</p>
+              <h4 style={{ margin: 0, color: 'var(--text-primary)', fontSize: 'var(--font-size-md)', fontWeight: 'var(--font-weight-medium)' }}>Standart</h4>
             </div>
           </div>
 
         </div>
       ) : (
-        <p style={{ color: '#dc3545', textAlign: 'center', marginTop: '50px' }}>Profil bilgileri bulunamadı!</p>
+        <p style={{ color: 'var(--accent-primary)', textAlign: 'center', marginTop: '50px' }}>Profil bilgileri bulunamadı.</p>
       )}
 
       {/* BUTONLAR BÖLGESİ */}
-      <div style={{ marginTop: '30px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+      <div style={{ marginTop: 'var(--space-5)', display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
         
         <button 
-          onClick={handleEditProfile}
-          style={{ width: '100%', padding: '15px', backgroundColor: '#1e293b', color: '#fff', border: '1px solid #334155', borderRadius: '12px', cursor: 'pointer', fontSize: '16px', fontWeight: 'bold' }}
+          onClick={toggleTheme}
+          className="interactive-element"
+          style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '14px', backgroundColor: 'var(--surface-primary)', color: 'var(--text-primary)', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-sm)', cursor: 'pointer', fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', backdropFilter: 'blur(10px)' }}
         >
-          Profili Düzenle ⚙️
+          {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+          {theme === 'dark' ? 'Aydınlık Temaya Geç' : 'Karanlık Temaya Geç'}
+        </button>
+
+        <button 
+          onClick={() => navigate('/profile/edit')}
+          className="interactive-element"
+          style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '14px', backgroundColor: 'var(--text-primary)', color: 'var(--bg-primary)', border: 'none', borderRadius: 'var(--radius-sm)', cursor: 'pointer', fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-bold)' }}
+        >
+          <Settings size={18} /> Yapılandırma
         </button>
 
         <button 
           onClick={handleLogout}
-          style={{ width: '100%', padding: '15px', backgroundColor: 'transparent', color: '#ef4444', border: '1px solid #ef4444', borderRadius: '12px', cursor: 'pointer', fontSize: '16px', fontWeight: 'bold' }}
+          className="interactive-element"
+          style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '14px', backgroundColor: 'transparent', color: 'var(--text-muted)', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-sm)', cursor: 'pointer', fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)' }}
         >
-          Sistemden Çıkış Yap
+          <LogOut size={18} /> Sistemi Kapat
         </button>
       </div>
 

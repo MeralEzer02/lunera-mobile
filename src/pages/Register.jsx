@@ -4,6 +4,10 @@ import toast from 'react-hot-toast';
 import { api } from '../api/client';
 import { getErrorMessage } from '../utils/getErrorMessage';
 import { Eye, EyeOff, UserPlus } from 'lucide-react';
+import { useTheme } from '../theme/ThemeProvider';
+
+import lightBg from '../assets/bg-light.png';
+import darkBg from '../assets/bg-dark.png';
 
 export default function Register() {
   const [email, setEmail] = useState('');
@@ -17,6 +21,7 @@ export default function Register() {
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
+  const { theme } = useTheme();
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -62,22 +67,30 @@ export default function Register() {
   };
 
   return (
-    <div style={{ 
+    <div className="page-transition" style={{ 
       minHeight: '100vh', 
       display: 'flex', 
       flexDirection: 'column', 
       justifyContent: 'center', 
       padding: 'var(--space-4)', 
-      backgroundColor: 'var(--bg-primary)',
+      backgroundImage: `url(${theme === 'light' ? lightBg : darkBg})`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundAttachment: 'fixed',
+      position: 'relative',
       paddingBottom: '40px'
     }}>
-      
+            
       <div style={{ 
         backgroundColor: 'var(--surface-primary)', 
         padding: 'var(--space-5) var(--space-4)', 
         borderRadius: 'var(--radius-lg)', 
         border: '1px solid var(--border-subtle)',
-        boxShadow: 'var(--shadow-soft)'
+        boxShadow: 'var(--shadow-soft)',
+        position: 'relative',
+        zIndex: 1,
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)'
       }}>
         
         <div style={{ textAlign: 'center', marginBottom: 'var(--space-5)' }}>

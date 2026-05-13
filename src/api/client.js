@@ -5,18 +5,22 @@ export const api = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
+  timeout: 10000,
 });
 
-// 1. REQUEST INTERCEPTOR: Giden her isteğe bileti (Token) ekler
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  },
+);
 
-// 2. RESPONSE INTERCEPTOR: Gelen hataları dinler (SESSION HARDENING)
 api.interceptors.response.use(
   (response) => response,
   (error) => {
